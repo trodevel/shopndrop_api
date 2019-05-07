@@ -26,7 +26,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 namespace shopndrop_api;
 
 require_once __DIR__.'/../shopndrop_protocol/shopndrop_protocol.php';
-require_once __DIR__.'/../shopndrop_protocol/response_parser.php';    // ResponseParser::parse()
+require_once __DIR__.'/../shopndrop_protocol/response_parser.php';      // ResponseParser::parse()
+require_once __DIR__.'/../shopndrop_protocol/response_parser_web.php';  // ResponseParser::parse()
 require_once __DIR__.'/../generic_api/api.php';
 
 class Api extends \generic_api\Api
