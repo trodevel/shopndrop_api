@@ -21,11 +21,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 11117 $ $Date:: 2019-05-08 #$ $Author: serge $
+// $Revision: 11134 $ $Date:: 2019-05-08 #$ $Author: serge $
 
 namespace shopndrop_api;
 
 require_once __DIR__.'/../shopndrop_protocol/shopndrop_protocol.php';
+require_once __DIR__.'/../shopndrop_protocol/shopndrop_protocol_web.php';
 require_once __DIR__.'/../shopndrop_protocol/response_parser.php';      // ResponseParser::parse()
 require_once __DIR__.'/../shopndrop_protocol/response_parser_web.php';  // ResponseParser::parse()
 require_once __DIR__.'/../generic_api/api.php';
