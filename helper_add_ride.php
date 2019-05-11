@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11264 $ $Date:: 2019-05-11 #$ $Author: serge $
+// $Revision: 11266 $ $Date:: 2019-05-11 #$ $Author: serge $
 
 namespace shopndrop_api;
 
@@ -30,10 +30,43 @@ function add_ride( & $api, $session_id, $plz, $time, $max_weight, & $ride_id, & 
     }
     else
     {
+        $new_resp = new \generic_protocol\ErrorResponse( \generic_protocol\ErrorResponse::RUNTIME_ERROR, "unknown response: " . get_class( $resp ) );
+
+        $resp = $new_resp;
+
         return false;
     }
 
     return true;
+}
+
+function add_ride_auto( $host, $port, $login, $password, $plz, $time, $max_weight, & $ride_id, & $resp )
+{
+    $api = new \shopndrop_api\Api( $host, $port );
+
+    $error_msg = NULL;
+    $session_id = NULL;
+
+    // open session
+    if( $api->open_session( $login, $password, $session_id, $error_msg ) == true )
+    {
+        $res = add_ride( $api, $session_id, $plz, $time, $max_weight, $ride_id, $resp );
+
+        if( $api->close_session( $session_id, $error_msg ) == true )
+        {
+            //echo "OK: session closed\n";
+        }
+        else
+        {
+            //echo "ERROR: cannot close session: $error_msg\n";
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    return $res;
 }
 
 ?>
