@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11266 $ $Date:: 2019-05-11 #$ $Author: serge $
+// $Revision: 11269 $ $Date:: 2019-05-11 #$ $Author: serge $
 
 namespace shopndrop_api;
 
@@ -9,8 +9,8 @@ function add_ride( & $api, $session_id, $plz, $time, $max_weight, & $ride_id, & 
 {
     $position       = \shopndrop_protocol\GeoPosition::withPlz( $plz );
 
-    $now_plus_delay = localtime( $time, true );
-    $delivery_time  = new \basic_objects\LocalTime( $now_plus_delay["tm_year"] + 1900, $now_plus_delay["tm_mon"] + 1, $now_plus_delay["tm_mday"],     $now_plus_delay["tm_hour"], $now_plus_delay["tm_min"], $now_plus_delay["tm_sec"] );
+    $localtime      = localtime( $time, true );
+    $delivery_time  = new \basic_objects\LocalTime( $localtime["tm_year"] + 1900, $localtime["tm_mon"] + 1, $localtime["tm_mday"],     $localtime["tm_hour"], $localtime["tm_min"], $localtime["tm_sec"] );
 
     $ride = new \shopndrop_protocol\Ride( $position, $delivery_time, $max_weight );
 
@@ -63,6 +63,8 @@ function add_ride_auto( $host, $port, $login, $password, $plz, $time, $max_weigh
     }
     else
     {
+        $resp = new \generic_protocol\ErrorResponse( \generic_protocol\ErrorResponse::RUNTIME_ERROR, "cannot open session: " . $error_msg );
+
         return false;
     }
 
