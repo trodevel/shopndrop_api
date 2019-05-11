@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11130 $ $Date:: 2019-05-08 #$ $Author: serge $
+// $Revision: 11256 $ $Date:: 2019-05-11 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
 require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
@@ -53,7 +53,7 @@ echo "TEST: AddRideRequest\n";
             }
             elseif( get_class( $resp ) == "shopndrop_protocol\AddRideResponse" )
             {
-                $phone_id = $resp->ride_id;
+                $ride_id = $resp->ride_id;
                 echo "OK: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
             }
             else
