@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11256 $ $Date:: 2019-05-11 #$ $Author: serge $
+// $Revision: 11329 $ $Date:: 2019-05-13 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
 require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
@@ -38,11 +38,11 @@ echo "TEST: AddRideRequest\n";
 
         $max_weight     = 3.5; // kg
 
-        $ride = new \shopndrop_protocol\Ride( $position, $delivery_time, $max_weight );
+        $ride_summary = new \shopndrop_protocol\RideSummary( $position, $delivery_time, $max_weight );
 
         // execute request
         {
-            $req = new \shopndrop_protocol\AddRideRequest( $session_id, $ride );
+            $req = new \shopndrop_protocol\AddRideRequest( $session_id, $ride_summary );
 
             echo "REQ = " . $req->to_generic_request() . "\n";
             $resp = $api->submit( $req );

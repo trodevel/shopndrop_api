@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11269 $ $Date:: 2019-05-11 #$ $Author: serge $
+// $Revision: 11329 $ $Date:: 2019-05-13 #$ $Author: serge $
 
 namespace shopndrop_api;
 
@@ -12,11 +12,11 @@ function add_ride( & $api, $session_id, $plz, $time, $max_weight, & $ride_id, & 
     $localtime      = localtime( $time, true );
     $delivery_time  = new \basic_objects\LocalTime( $localtime["tm_year"] + 1900, $localtime["tm_mon"] + 1, $localtime["tm_mday"],     $localtime["tm_hour"], $localtime["tm_min"], $localtime["tm_sec"] );
 
-    $ride = new \shopndrop_protocol\Ride( $position, $delivery_time, $max_weight );
+    $ride_summary   = new \shopndrop_protocol\RideSummary( $position, $delivery_time, $max_weight );
 
     // execute request
 
-    $req = new \shopndrop_protocol\AddRideRequest( $session_id, $ride );
+    $req = new \shopndrop_protocol\AddRideRequest( $session_id, $ride_summary );
 
     $resp = $api->submit( $req );
 
