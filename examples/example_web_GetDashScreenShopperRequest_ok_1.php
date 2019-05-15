@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11412 $ $Date:: 2019-05-14 #$ $Author: serge $
+// $Revision: 11415 $ $Date:: 2019-05-14 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
 require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
@@ -10,7 +10,7 @@ $error_msg = "";
 $user_id = 0;
 
 echo "\n";
-echo "TEST: GetDashScreenUserRequest\n";
+echo "TEST: GetDashScreenShopperRequest\n";
 {
     $api = new \shopndrop_api\Api( $host, $port );
 
@@ -33,7 +33,7 @@ echo "TEST: GetDashScreenUserRequest\n";
 
         // execute request
         {
-            $req = new \shopndrop_protocol\web\GetDashScreenUserRequest( $session_id, $user_id, $position );
+            $req = new \shopndrop_protocol\web\GetDashScreenShopperRequest( $session_id, $user_id, $position );
 
             echo "REQ = " . $req->to_generic_request() . "\n";
             $resp = $api->submit( $req );
@@ -42,7 +42,7 @@ echo "TEST: GetDashScreenUserRequest\n";
             {
                 echo "ERROR: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
             }
-            elseif( get_class( $resp ) == "shopndrop_protocol\web\GetDashScreenUserResponse" )
+            elseif( get_class( $resp ) == "shopndrop_protocol\web\GetDashScreenShopperResponse" )
             {
                 echo "OK: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
             }

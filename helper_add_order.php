@@ -1,17 +1,15 @@
 <?php
-// $Revision: 11424 $ $Date:: 2019-05-14 #$ $Author: serge $
+// $Revision: 11422 $ $Date:: 2019-05-14 #$ $Author: serge $
 
 namespace shopndrop_api;
 
 require_once __DIR__.'/api.php';
 
-function get_dash_screen_user( & $api, $session_id, $user_id, $plz, & $resp )
+function add_order( & $api, $session_id, $ride_id, $shopping_list, $delivery_address, & $order_id, & $resp )
 {
     // execute request
 
-    $position = \shopndrop_protocol\GeoPosition::withPlz( $plz );
-
-    $req = new \shopndrop_protocol\web\GetDashScreenUserRequest( $session_id, $user_id, $position );
+    $req = new \shopndrop_protocol\AddOrderRequest( $session_id, $ride_id, $shopping_list, $delivery_address );
 
     $resp = $api->submit( $req );
 
@@ -19,8 +17,9 @@ function get_dash_screen_user( & $api, $session_id, $user_id, $plz, & $resp )
     {
         return false;
     }
-    elseif( get_class( $resp ) == "shopndrop_protocol\web\GetDashScreenUserResponse" )
+    elseif( get_class( $resp ) == "shopndrop_protocol\AddOrderResponse" )
     {
+        $order_id = $resp->order_id;
     }
     else
     {
@@ -34,7 +33,7 @@ function get_dash_screen_user( & $api, $session_id, $user_id, $plz, & $resp )
     return true;
 }
 
-function get_dash_screen_user_auto( $host, $port, $login, $password, $plz, & $resp )
+function add_order_auto( $host, $port, $login, $password, $ride_id, $shopping_list, $delivery_address, & $order_id, & $resp )
 {
     $api = new \shopndrop_api\Api( $host, $port );
 
@@ -44,9 +43,7 @@ function get_dash_screen_user_auto( $host, $port, $login, $password, $plz, & $re
     // open session
     if( $api->open_session( $login, $password, $session_id, $error_msg ) == true )
     {
-        $user_id = 1;
-
-        $res = get_dash_screen_user( $api, $session_id, $user_id, $plz, $resp );
+        $res = add_order( $api, $session_id, $ride_id, $shopping_list, $delivery_address, $order_id, $resp );
 
         if( $api->close_session( $session_id, $error_msg ) == true )
         {

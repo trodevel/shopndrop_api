@@ -5,13 +5,13 @@ namespace shopndrop_api;
 
 require_once __DIR__.'/api.php';
 
-function get_dash_screen_user( & $api, $session_id, $user_id, $plz, & $resp )
+function get_dash_screen_shopper( & $api, $session_id, $user_id, $plz, & $resp )
 {
     // execute request
 
     $position = \shopndrop_protocol\GeoPosition::withPlz( $plz );
 
-    $req = new \shopndrop_protocol\web\GetDashScreenUserRequest( $session_id, $user_id, $position );
+    $req = new \shopndrop_protocol\web\GetDashScreenshopperRequest( $session_id, $user_id, $position );
 
     $resp = $api->submit( $req );
 
@@ -19,7 +19,7 @@ function get_dash_screen_user( & $api, $session_id, $user_id, $plz, & $resp )
     {
         return false;
     }
-    elseif( get_class( $resp ) == "shopndrop_protocol\web\GetDashScreenUserResponse" )
+    elseif( get_class( $resp ) == "shopndrop_protocol\web\GetDashScreenShopperResponse" )
     {
     }
     else
@@ -34,7 +34,7 @@ function get_dash_screen_user( & $api, $session_id, $user_id, $plz, & $resp )
     return true;
 }
 
-function get_dash_screen_user_auto( $host, $port, $login, $password, $plz, & $resp )
+function get_dash_screen_shopper_auto( $host, $port, $login, $password, $plz, & $resp )
 {
     $api = new \shopndrop_api\Api( $host, $port );
 
@@ -46,7 +46,7 @@ function get_dash_screen_user_auto( $host, $port, $login, $password, $plz, & $re
     {
         $user_id = 1;
 
-        $res = get_dash_screen_user( $api, $session_id, $user_id, $plz, $resp );
+        $res = get_dash_screen_shopper( $api, $session_id, $user_id, $plz, $resp );
 
         if( $api->close_session( $session_id, $error_msg ) == true )
         {
