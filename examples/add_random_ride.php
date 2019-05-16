@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11332 $ $Date:: 2019-05-13 #$ $Author: serge $
+// $Revision: 11475 $ $Date:: 2019-05-17 #$ $Author: serge $
 
 require_once __DIR__.'/../helper_add_ride.php';
 require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
@@ -7,7 +7,7 @@ require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
 function add_random_ride( $host, $port, $login, $password, $plz_base, $delay_base, $max_weight_base, & $ride_id )
 {
     $plz        = $plz_base + rand( 0, 100 ) * 20;
-    $time       = time() + ( $delay_base + rand( 0, 10 ) * 15 ) * 60;
+    $time       = \shopndrop_api\time_to_LocalTime( time() + ( $delay_base + rand( 0, 10 ) * 15 ) * 60 );
     $max_weight = $max_weight_base + rand( 0, 5 ) * .5; // kg
 
     $resp    = NULL;

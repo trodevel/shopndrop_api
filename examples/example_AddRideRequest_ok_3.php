@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11267 $ $Date:: 2019-05-11 #$ $Author: serge $
+// $Revision: 11475 $ $Date:: 2019-05-17 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
 require_once __DIR__.'/../helper_add_ride.php';
@@ -14,7 +14,7 @@ echo "TEST: AddRideRequest\n";
     // create ride
 
     $plz = 50668; // Center of Cologne
-    $time = time() + 30 * 60;   // 30 min from now
+    $time = \shopndrop_api\time_to_LocalTime( time() + 30 * 60 );   // 30 min from now
     $max_weight     = 3.5; // kg
 
     $ride_id = NULL;
