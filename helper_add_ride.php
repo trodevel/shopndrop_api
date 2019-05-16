@@ -1,16 +1,27 @@
 <?php
-// $Revision: 11329 $ $Date:: 2019-05-13 #$ $Author: serge $
+// $Revision: 11474 $ $Date:: 2019-05-17 #$ $Author: serge $
 
 namespace shopndrop_api;
 
 require_once __DIR__.'/api.php';
 
-function add_ride( & $api, $session_id, $plz, $time, $max_weight, & $ride_id, & $resp )
+function time_to_LocalTime( $time )
+{
+    $localtime  = localtime( $time, true );
+    $res        = new \basic_objects\LocalTime(
+            $localtime["tm_year"] + 1900,
+            $localtime["tm_mon"] + 1,
+            $localtime["tm_mday"],
+            $localtime["tm_hour"],
+            $localtime["tm_min"],
+            $localtime["tm_sec"] );
+
+    return $res;
+}
+
+function add_ride( & $api, $session_id, $plz, $delivery_time, $max_weight, & $ride_id, & $resp )
 {
     $position       = \shopndrop_protocol\GeoPosition::withPlz( $plz );
-
-    $localtime      = localtime( $time, true );
-    $delivery_time  = new \basic_objects\LocalTime( $localtime["tm_year"] + 1900, $localtime["tm_mon"] + 1, $localtime["tm_mday"],     $localtime["tm_hour"], $localtime["tm_min"], $localtime["tm_sec"] );
 
     $ride_summary   = new \shopndrop_protocol\RideSummary( $position, $delivery_time, $max_weight );
 
