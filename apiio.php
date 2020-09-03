@@ -21,26 +21,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 11134 $ $Date:: 2019-05-08 #$ $Author: serge $
+// $Revision: 13646 $ $Date:: 2020-09-04 #$ $Author: serge $
 
 namespace shopndrop_api;
 
-require_once __DIR__.'/../shopndrop_protocol/shopndrop_protocol.php';
-require_once __DIR__.'/../shopndrop_protocol/shopndrop_protocol_web.php';
-require_once __DIR__.'/../shopndrop_protocol/response_parser.php';      // ResponseParser::parse()
-require_once __DIR__.'/../shopndrop_protocol/response_parser_web.php';  // ResponseParser::parse()
-require_once __DIR__.'/../generic_api/api.php';
+require_once __DIR__.'/../shopndrop_protocol/protocol.php';
+require_once __DIR__.'/../shopndrop_web_protocol/protocol.php';
+require_once __DIR__.'/../shopndrop_protocol/parser.php';      // Parser::parse()
+require_once __DIR__.'/../shopndrop_web_protocol/parser.php';  // Parser::parse()
+require_once __DIR__.'/../generic_api/apiio.php';
 
-class Api extends \generic_api\Api
+class ApiIO extends \generic_api\ApiIO
 {
     protected function parse_response( $resp )
     {
-        $res = \shopndrop_protocol\web\ResponseParser::parse( $resp );
+        $res = \shopndrop_web_protocol\Parser::parse( $resp );
 
-        if( $res != NULL )
-            return $res;
+        return $res;
+    }
 
-        return \generic_protocol\ResponseParser::create_parse_error();
+    protected function to_generic_request( $req )
+    {
+        $res = \shopndrop_web_protocol\to_generic_request( $req );
+
+        return $res;
     }
 }
 
