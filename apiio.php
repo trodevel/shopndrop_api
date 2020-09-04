@@ -21,14 +21,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 13646 $ $Date:: 2020-09-04 #$ $Author: serge $
+// $Revision: 13673 $ $Date:: 2020-09-04 #$ $Author: serge $
 
 namespace shopndrop_api;
 
-require_once __DIR__.'/../shopndrop_protocol/protocol.php';
-require_once __DIR__.'/../shopndrop_web_protocol/protocol.php';
 require_once __DIR__.'/../shopndrop_protocol/parser.php';      // Parser::parse()
+require_once __DIR__.'/../shopndrop_protocol/request_encoder.php';    // \to_generic_request()
 require_once __DIR__.'/../shopndrop_web_protocol/parser.php';  // Parser::parse()
+require_once __DIR__.'/../shopndrop_web_protocol/request_encoder.php';    // \to_generic_request()
 require_once __DIR__.'/../generic_api/apiio.php';
 
 class ApiIO extends \generic_api\ApiIO
