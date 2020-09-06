@@ -1,8 +1,8 @@
 <?php
-// $Revision: 11258 $ $Date:: 2019-05-11 #$ $Author: serge $
+// $Revision: 13722 $ $Date:: 2020-09-06 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
-require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
+require_once __DIR__.'/../../shopndrop_web_protocol/html_helper.php';
 require_once '../credentials.php';
 
 $error_msg = "";
@@ -14,74 +14,43 @@ $order_id = 0;
 
 echo "\n";
 echo "TEST: AddOrderRequest\n";
+try
 {
     $api = new \shopndrop_api\Api( $host, $port );
 
     $session_id = NULL;
 
-    // open session
-    if( $api->open_session( $login, $password, $session_id, $error_msg ) == true )
-    {
-        echo "OK: opened session\n";
+    $api->open_session( $login, $password, $session_id, $error_msg );
 
-        // get user ID
-        $req = new \generic_protocol\GetUserIdRequest( $session_id, $login );
+    $api->get_user_id( $session_id, $login, $user_id, $error_msg );
 
-        echo "REQ = " . $req->to_generic_request() . "\n";
-        $resp = $api->submit( $req );
-        echo "user id = " . $resp->user_id . "\n\n";
-        $user_id = $resp->user_id;
+    echo "user id = " . $user_id . "\n\n";
 
-        // create order
+    // create order
 
-        $items = array();
+    $items = array();
 
-        array_push( $items, new \shopndrop_protocol\ShoppingItem( 121212, 1 ) );
-        array_push( $items, new \shopndrop_protocol\ShoppingItem( 232323, 2 ) );
-        array_push( $items, new \shopndrop_protocol\ShoppingItem( 343434, 7 ) );
+    array_push( $items, \shopndrop_protocol\create__ShoppingItem( 121212, 1 ) );
+    array_push( $items, \shopndrop_protocol\create__ShoppingItem( 232323, 2 ) );
+    array_push( $items, \shopndrop_protocol\create__ShoppingItem( 343434, 7 ) );
 
-        $shopping_list  = new \shopndrop_protocol\ShoppingList( $items );
+    $shopping_list  = \shopndrop_protocol\create__ShoppingList( $items );
 
-        $delivery_address = new \shopndrop_protocol\Address( 50668, "Germany", "Köln", "Eigelstein", "10", "" );
+    $delivery_address = \shopndrop_protocol\create__Address( 50668, "Germany", "Köln", "Eigelstein", "10", "" );
 
-        $req = new \shopndrop_protocol\AddOrderRequest( $session_id, $ride_id, $shopping_list, $delivery_address );
+    // execute request
 
-        // execute request
-        {
-            $req = new \shopndrop_protocol\AddOrderRequest( $session_id, $ride_id, $shopping_list, $delivery_address );
+    $resp = NULL;
 
-            echo "REQ = " . $req->to_generic_request() . "\n";
-            $resp = $api->submit( $req );
+    $api->add_order( $session_id, $ride_id, $shopping_list, $delivery_address, $order_id, $resp );
 
-            if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
-            {
-                echo "ERROR: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-            }
-            elseif( get_class( $resp ) == "shopndrop_protocol\AddOrderResponse" )
-            {
-                $order_id = $resp->order_id;
-                echo "OK: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-            }
-            else
-            {
-                echo "ERROR: unknown response: " . get_class( $resp ) . "\n\n";
-            }
-        }
+    echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
 
-        // close session
-        if( $api->close_session( $session_id, $error_msg ) == true )
-        {
-            echo "OK: session closed\n";
-        }
-        else
-        {
-            echo "ERROR: cannot close session: $error_msg\n";
-        }
-    }
-    else
-    {
-        echo "ERROR: cannot open session: $error_msg\n";
-    }
+    $api->close_session( $session_id, $error_msg );
+}
+catch( \Exception $e )
+{
+    echo "FATAL: $e\n";
 }
 
 ?>

@@ -1,81 +1,55 @@
 <?php
-// $Revision: 11329 $ $Date:: 2019-05-13 #$ $Author: serge $
+// $Revision: 13732 $ $Date:: 2020-09-06 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
-require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
+require_once __DIR__.'/../../shopndrop_web_protocol/html_helper.php';
+require_once __DIR__.'/../../basic_objects/object_initializer.php';
 require_once '../credentials.php';
 
 $error_msg = "";
 
 $user_id = 0;
 
+$ride_id = 0;
+
 echo "\n";
 echo "TEST: AddRideRequest\n";
+try
 {
     $api = new \shopndrop_api\Api( $host, $port );
 
     $session_id = NULL;
 
-    // open session
-    if( $api->open_session( $login, $password, $session_id, $error_msg ) == true )
+    $api->open_session( $login, $password, $session_id, $error_msg );
+
+    $api->get_user_id( $session_id, $login, $user_id, $error_msg );
+
+    echo "user id = " . $user_id . "\n\n";
+
+    // create ride
+
+    $plz            = 50668; // Center of Cologne
+
+    $now_plus_delay = localtime( time() + 30 * 60, true );   // 30 min from now
+    $delivery_time  = \basic_objects\create__LocalTime( $now_plus_delay["tm_year"] + 1900, $now_plus_delay["tm_mon"] + 1, $now_plus_delay["tm_mday"], $now_plus_delay["tm_hour"], $now_plus_delay["tm_min"], $now_plus_delay["tm_sec"] );
+
+    $max_weight     = 3.5; // kg
+
+    if( $api->add_ride( $session_id, $plz, $delivery_time, $max_weight, $ride_id, $resp ) == false )
     {
-        echo "OK: opened session\n";
-
-        // get user ID
-        $req = new \generic_protocol\GetUserIdRequest( $session_id, $login );
-
-        echo "REQ = " . $req->to_generic_request() . "\n";
-        $resp = $api->submit( $req );
-        echo "user id = " . $resp->user_id . "\n\n";
-        $user_id = $resp->user_id;
-
-        // create ride
-
-        $position       = \shopndrop_protocol\GeoPosition::withPlz( 50668 ); // Center of Cologne
-
-        $now_plus_delay = localtime( time() + 30 * 60, true );   // 30 min from now
-        $delivery_time  = new \basic_objects\LocalTime( $now_plus_delay["tm_year"] + 1900, $now_plus_delay["tm_mon"] + 1, $now_plus_delay["tm_mday"], $now_plus_delay["tm_hour"], $now_plus_delay["tm_min"], $now_plus_delay["tm_sec"] );
-
-        $max_weight     = 3.5; // kg
-
-        $ride_summary = new \shopndrop_protocol\RideSummary( $position, $delivery_time, $max_weight );
-
-        // execute request
-        {
-            $req = new \shopndrop_protocol\AddRideRequest( $session_id, $ride_summary );
-
-            echo "REQ = " . $req->to_generic_request() . "\n";
-            $resp = $api->submit( $req );
-
-            if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
-            {
-                echo "ERROR: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-            }
-            elseif( get_class( $resp ) == "shopndrop_protocol\AddRideResponse" )
-            {
-                $ride_id = $resp->ride_id;
-                echo "OK: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-            }
-            else
-            {
-                echo "ERROR: unknown response: " . get_class( $resp ) . "\n\n";
-            }
-        }
-
-        // close session
-        if( $api->close_session( $session_id, $error_msg ) == true )
-        {
-            echo "OK: session closed\n";
-        }
-        else
-        {
-            echo "ERROR: cannot close session: $error_msg\n";
-        }
+        echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
+        throw new \Exception( "cannot add ride" );
     }
-    else
-    {
-        echo "ERROR: cannot open session: $error_msg\n";
-    }
+
+    echo "ride id = " . $ride_id . "\n\n";
+
+    echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
+
+    $api->close_session( $session_id, $error_msg );
+}
+catch( \Exception $e )
+{
+    echo "FATAL: $e\n";
 }
 
 ?>

@@ -1,8 +1,9 @@
 <?php
-// $Revision: 11329 $ $Date:: 2019-05-13 #$ $Author: serge $
+// $Revision: 13724 $ $Date:: 2020-09-06 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
-require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
+require_once __DIR__.'/../../shopndrop_web_protocol/html_helper.php';
+require_once __DIR__.'/../../basic_objects/object_initializer.php';
 require_once '../credentials.php';
 
 $error_msg = "";
@@ -14,111 +15,59 @@ $order_id = 0;
 
 echo "\n";
 echo "TEST: AddOrderRequest\n";
+try
 {
     $api = new \shopndrop_api\Api( $host, $port );
 
     $session_id = NULL;
 
-    // open session
-    if( $api->open_session( $login, $password, $session_id, $error_msg ) == true )
-    {
-        echo "OK: opened session\n";
+    $api->open_session( $login, $password, $session_id, $error_msg );
 
-        // get user ID
-        $req = new \generic_protocol\GetUserIdRequest( $session_id, $login );
+    $api->get_user_id( $session_id, $login, $user_id, $error_msg );
 
-        echo "REQ = " . $req->to_generic_request() . "\n";
-        $resp = $api->submit( $req );
-        echo "user id = " . $resp->user_id . "\n\n";
-        $user_id = $resp->user_id;
+    echo "user id = " . $user_id . "\n\n";
 
-        // create ride
+    // create ride
 
-        $position       = \shopndrop_protocol\GeoPosition::withPlz( 50668 ); // Center of Cologne
+    $plz            = 50668; // Center of Cologne
 
-        $now_plus_delay = localtime( time() + 30 * 60, true );   // 30 min from now
-        $delivery_time  = new \basic_objects\LocalTime( $now_plus_delay["tm_year"] + 1900, $now_plus_delay["tm_mon"] + 1, $now_plus_delay["tm_mday"], $now_plus_delay["tm_hour"], $now_plus_delay["tm_min"], $now_plus_delay["tm_sec"] );
+    $now_plus_delay = localtime( time() + 30 * 60, true );   // 30 min from now
+    $delivery_time  = \basic_objects\create__LocalTime( $now_plus_delay["tm_year"] + 1900, $now_plus_delay["tm_mon"] + 1, $now_plus_delay["tm_mday"], $now_plus_delay["tm_hour"], $now_plus_delay["tm_min"], $now_plus_delay["tm_sec"] );
 
-        $max_weight     = 3.5; // kg
+    $max_weight     = 3.5; // kg
 
-        $ride_summary = new \shopndrop_protocol\RideSummary( $position, $delivery_time, $max_weight );
+    if( $api->add_ride( $session_id, $plz, $delivery_time, $max_weight, $ride_id, $resp ) == false )
+        throw new \Exception( "cannot add ride" );
 
-        // execute request
-        {
-            $req = new \shopndrop_protocol\AddRideRequest( $session_id, $ride_summary );
+    echo "ride id = " . $ride_id . "\n\n";
 
-            echo "REQ = " . $req->to_generic_request() . "\n";
-            $resp = $api->submit( $req );
+    echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
 
-            if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
-            {
-                echo "ERROR: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-            }
-            elseif( get_class( $resp ) == "shopndrop_protocol\AddRideResponse" )
-            {
-                $ride_id = $resp->ride_id;
-                echo "OK: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-            }
-            else
-            {
-                echo "ERROR: unknown response: " . get_class( $resp ) . "\n\n";
-            }
-        }
+    // create order
 
-        // create order
+    $items = array();
 
-        if( $ride_id != 0 )
-        {
+    array_push( $items, \shopndrop_protocol\create__ShoppingItem( 13, 1 ) );
+    array_push( $items, \shopndrop_protocol\create__ShoppingItem( 14, 2 ) );
+    array_push( $items, \shopndrop_protocol\create__ShoppingItem( 15, 7 ) );
 
-        $items = array();
+    $shopping_list  = \shopndrop_protocol\create__ShoppingList( $items );
 
-        array_push( $items, new \shopndrop_protocol\ShoppingItem( 121212, 1 ) );
-        array_push( $items, new \shopndrop_protocol\ShoppingItem( 232323, 2 ) );
-        array_push( $items, new \shopndrop_protocol\ShoppingItem( 343434, 7 ) );
+    $delivery_address = \shopndrop_protocol\create__Address( 50668, "Germany", "Köln", "Eigelstein", "10", "" );
 
-        $shopping_list  = new \shopndrop_protocol\ShoppingList( $items );
+    // execute request
 
-        $delivery_address = new \shopndrop_protocol\Address( 50668, "Germany", "Köln", "Eigelstein", "10", "" );
+    $resp = NULL;
 
-        $req = new \shopndrop_protocol\AddOrderRequest( $session_id, $ride_id, $shopping_list, $delivery_address );
+    $api->add_order( $session_id, $ride_id, $shopping_list, $delivery_address, $order_id, $resp );
 
-        // execute request
-        {
-            $req = new \shopndrop_protocol\AddOrderRequest( $session_id, $ride_id, $shopping_list, $delivery_address );
+    echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
 
-            echo "REQ = " . $req->to_generic_request() . "\n";
-            $resp = $api->submit( $req );
-
-            if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
-            {
-                echo "ERROR: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-            }
-            elseif( get_class( $resp ) == "shopndrop_protocol\AddOrderResponse" )
-            {
-                $order_id = $resp->order_id;
-                echo "OK: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-            }
-            else
-            {
-                echo "ERROR: unknown response: " . get_class( $resp ) . "\n\n";
-            }
-        }
-        }
-
-        // close session
-        if( $api->close_session( $session_id, $error_msg ) == true )
-        {
-            echo "OK: session closed\n";
-        }
-        else
-        {
-            echo "ERROR: cannot close session: $error_msg\n";
-        }
-    }
-    else
-    {
-        echo "ERROR: cannot open session: $error_msg\n";
-    }
+    $api->close_session( $session_id, $error_msg );
+}
+catch( \Exception $e )
+{
+    echo "FATAL: $e\n";
 }
 
 ?>

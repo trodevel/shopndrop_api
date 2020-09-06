@@ -1,5 +1,5 @@
 <?php
-// $Revision: 11425 $ $Date:: 2019-05-14 #$ $Author: serge $
+// $Revision: 13725 $ $Date:: 2020-09-06 #$ $Author: serge $
 
 require_once 'add_random_ride.php';
 require_once __DIR__.'/../helper_add_order.php';
@@ -13,13 +13,13 @@ add_random_ride( $host, $port, $login_1, $password, 50668, 30, 2, $ride_id );
 
 $items = array();
 
-array_push( $items, new \shopndrop_protocol\ShoppingItem( 121212, 1 ) );
-array_push( $items, new \shopndrop_protocol\ShoppingItem( 232323, 2 ) );
-array_push( $items, new \shopndrop_protocol\ShoppingItem( 343434, 7 ) );
+array_push( $items, \shopndrop_protocol\create__ShoppingItem( 121212, 1 ) );
+array_push( $items, \shopndrop_protocol\create__ShoppingItem( 232323, 2 ) );
+array_push( $items, \shopndrop_protocol\create__ShoppingItem( 343434, 7 ) );
 
-$shopping_list  = new \shopndrop_protocol\ShoppingList( $items );
+$shopping_list  = \shopndrop_protocol\create__ShoppingList( $items );
 
-$delivery_address = new \shopndrop_protocol\Address( 50668, "Germany", "Köln", "Eigelstein", "10", "" );
+$delivery_address = \shopndrop_protocol\create__Address( 50668, "Germany", "Köln", "Eigelstein", "10", "" );
 
 $order_id = NULL;
 $resp = NULL;
@@ -30,14 +30,14 @@ $res = \shopndrop_api\get_dash_screen_shopper_auto( $host, $port, $login_1, $pas
 
 if( $res )
 {
-    echo \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
+    echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
 }
 
 $res = \shopndrop_api\get_dash_screen_user_auto( $host, $port, $login_2, $password, 50668, $resp );
 
 if( $res )
 {
-    echo \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
+    echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
 }
 
 ?>

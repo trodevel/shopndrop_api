@@ -1,58 +1,46 @@
 <?php
-// $Revision: 11475 $ $Date:: 2019-05-17 #$ $Author: serge $
+// $Revision: 13732 $ $Date:: 2020-09-06 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
-require_once __DIR__.'/../helper_add_ride.php';
-require_once __DIR__.'/../../shopndrop_protocol/html_helper_web.php';
+require_once __DIR__.'/../../shopndrop_web_protocol/html_helper.php';
+require_once __DIR__.'/../../basic_objects/object_initializer.php';
 require_once '../credentials.php';
 
 $error_msg = "";
 
 echo "\n";
 echo "TEST: AddRideRequest\n";
+try
 {
     $api = new \shopndrop_api\Api( $host, $port );
 
     $session_id = NULL;
 
-    // open session
-    if( $api->open_session( $login, $password, $session_id, $error_msg ) == true )
+    $api->open_session( $login, $password, $session_id, $error_msg );
+
+    // create ride
+
+    $plz            = 50668; // Center of Cologne
+    $delivery_time  = \shopndrop_api\Api::time_to_LocalTime( time() + 30 * 60 );   // 30 min from now
+    $max_weight     = 3.5; // kg
+
+    $ride_id = NULL;
+
+    if( $api->add_ride( $session_id, $plz, $delivery_time, $max_weight, $ride_id, $resp ) == false )
     {
-        echo "OK: opened session\n";
-
-        // create ride
-
-        $plz = 50668; // Center of Cologne
-        $time = \shopndrop_api\time_to_LocalTime( time() + 30 * 60 );   // 30 min from now
-        $max_weight     = 3.5; // kg
-
-        $ride_id = NULL;
-
-        $res = \shopndrop_api\add_ride( $api, $session_id, $plz, $time, $max_weight, $ride_id, $resp );
-
-        if( $res == true )
-        {
-            echo "OK: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-        }
-        else
-        {
-            echo "ERROR: " . \shopndrop_protocol\web\to_html( $resp ) . "\n\n";
-        }
-
-        // close session
-        if( $api->close_session( $session_id, $error_msg ) == true )
-        {
-            echo "OK: session closed\n";
-        }
-        else
-        {
-            echo "ERROR: cannot close session: $error_msg\n";
-        }
+        echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
+        throw new \Exception( "cannot add ride" );
     }
-    else
-    {
-        echo "ERROR: cannot open session: $error_msg\n";
-    }
+
+    echo "ride id = " . $ride_id . "\n\n";
+
+    echo \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
+
+    $api->close_session( $session_id, $error_msg );
+}
+catch( \Exception $e )
+{
+    echo "FATAL: $e\n";
 }
 
 ?>
