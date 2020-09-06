@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 13672 $ $Date:: 2020-09-04 #$ $Author: serge $
+// $Revision: 13728 $ $Date:: 2020-09-06 #$ $Author: serge $
 
 namespace shopndrop_api;
 
@@ -80,7 +80,7 @@ class Api extends \generic_api\Api
         throw new InternalException( "unexpected response: " . get_class( $resp ) );
     }
 
-    public function time_to_LocalTime( $time )
+    public static function time_to_LocalTime( $time )
     {
         $localtime  = localtime( $time, true );
         $res        = \basic_objects\create__LocalTime(
