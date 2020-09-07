@@ -1,5 +1,5 @@
 <?php
-// $Revision: 13733 $ $Date:: 2020-09-06 #$ $Author: serge $
+// $Revision: 13735 $ $Date:: 2020-09-07 #$ $Author: serge $
 
 require_once __DIR__.'/../api.php';
 require_once __DIR__.'/../../shopndrop_web_protocol/html_helper.php';
@@ -10,6 +10,8 @@ function add_random_ride( $host, $port, $login, $password, $plz_base, $delay_bas
     $api = new \shopndrop_api\Api( $host, $port );
 
     $session_id = NULL;
+
+    $error_msg = NULL;
 
     $api->open_session( $login, $password, $session_id, $error_msg );
 
@@ -29,6 +31,8 @@ function add_random_ride( $host, $port, $login, $password, $plz_base, $delay_bas
     {
         echo "ERROR: " . \shopndrop_web_protocol\to_html( $resp ) . "\n\n";
     }
+
+    $api->close_session( $session_id, $error_msg );
 
     return $res;
 }
